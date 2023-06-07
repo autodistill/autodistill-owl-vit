@@ -9,11 +9,11 @@
   </p>
 </div>
 
-# Autodistill Grounded SAM Module
+# Autodistill OWL-ViT Module
 
-This repository contains the code supporting the Grounded SAM base model for use with [Autodistill](https://github.com/autodistill/autodistill).
+This repository contains the code supporting the OWL-ViT base model for use with [Autodistill](https://github.com/autodistill/autodistill).
 
-Grounded SAM uses the [Segment Anything Model](https://github.com/facebookresearch/segment-anything) to identify objects in an image and assign labels to each image.
+[OWL-ViT](https://huggingface.co/google/owlvit-base-patch32) is a transformer-based object detection model developed by Google Research.
 
 Read the full [Autodistill documentation](https://autodistill.github.io/autodistill/).
 
@@ -31,7 +31,7 @@ pip3 install autodistill-owl-vit
 ## Quickstart
 
 ```python
-from autodistill_owlv_vit import OWLViT
+from autodistill_owl_vit import OWLViT
 
 # define an ontology to map class names to our OWLViT prompt
 # the ontology dictionary has the format {caption: class}
