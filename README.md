@@ -49,6 +49,21 @@ base_model = OWLViT(
 base_model.label("./context_images", extension=".jpg")
 ```
 
+To use a query images instead of query text, use a DetectionOntology instead of a CaptionOntology:
+
+```python
+from autodistill.detection import DetectionOntology
+
+from autodistill_owl_vit import OWLViT
+
+example_cat = PIL.Image.open("cat.jpg")
+
+base_model = OWLViT(ontology=DetectionOntology([(example_cat, "cat")]))
+
+# label all images in a folder called `context_images`
+base_model.label("./context_images", extension=".jpg")
+```
+
 ## License
 
 The code in this repository is licensed under an [Apache 2.0 license](LICENSE).
