@@ -8,8 +8,7 @@ from autodistill.detection import DetectionBaseModel
 from PIL import Image
 from transformers import OwlViTForObjectDetection, OwlViTProcessor
 
-# from autodistill_owl_vit.owl_vit_object_detection.src.models import OwlViT
-from .models import OwlViT
+from autodistill_owl_vit.models import OwlViT
 
 HOME = os.path.expanduser("~")
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -17,7 +16,7 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # model = OwlViTForObjectDetection.from_pretrained("google/owlvit-large-patch14").to(
 #     DEVICE
 # )
-# checkpoint = torch.load("/home/jovyan/speir-datavol-115/models/owl_models/test.pt")
+# checkpoint = torch.load("/home/jovyan/speir           -datavol-115/models/owl_models/test.pt")
 # model = OwlViT().load_state_dict(checkpoint["model"]).to(DEVICE)
 # model = OwlViT().load_state_dict(torch.load('state_dict_path')).to(DEVICE)
 #     torch.load("/home/jovyan/speir-datavol-115/models/owl_models/test.pt")
@@ -49,11 +48,12 @@ class OWLViT_Finetuned(DetectionBaseModel):
         with torch.no_grad():
             queries = pretrained_model(**inputs).text_embeds
 
-        self.ft_model = (
-            OwlViT(pretrained_model=pretrained_model, query_bank=queries)
-            .load_state_dict(torch.load(model_path))
-            .to(DEVICE)
-        )
+        model = OwlViT(pretrained_model=pretrained_model, query_bank=queries)
+        model_dict = torch.load(model_path)
+        # remove backbone.embeddings.position_ids from model_dict
+        del model_dict["backbone.embeddings.position_ids"]
+        model.load_state_dict(model_dict)
+        self.ft_model = model.to(DEVICE)
 
     def predict(self, input: str) -> sv.Detections:
         # labels = self.ontology.prompts()
@@ -84,7 +84,7 @@ class OWLViT_Finetuned(DetectionBaseModel):
 
             # i = 0
 
-            confidences = softmax(pred_class_logits)
+            confidences = torch.nn.softmax(pred_class_logits)
 
             detections = sv.Detections(
                 xyxy=np.array(pred_boxes),
@@ -93,8 +93,3 @@ class OWLViT_Finetuned(DetectionBaseModel):
             )
 
             return detections
-
-
-def softmax(logits):
-    e = np.exp(logits - np.max(logits))  # to prevent overflow
-    return e / e.sum(axis=-1, keepdims=True)

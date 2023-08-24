@@ -10,7 +10,6 @@ from transformers import AutoProcessor, OwlViTForObjectDetection
 from transformers.image_transforms import center_to_corners_format
 import random
 
-
 # Monkey patched for no in-place ops
 class PatchedOwlViTClassPredictionHead(nn.Module):
     def __init__(self, original_cls_head):

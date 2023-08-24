@@ -11,20 +11,18 @@ from transformers import OwlViTForObjectDetection, OwlViTProcessor
 HOME = os.path.expanduser("~")
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-model = OwlViTForObjectDetection.from_pretrained("google/owlvit-large-patch14").to(
-    DEVICE
-)
-processor = OwlViTProcessor.from_pretrained("google/owlvit-large-patch14")
 
-
-@dataclass
+# @dataclass
 class OWLViT(DetectionBaseModel):
-    ontology: CaptionOntology
-    owlvit_model: model
+    # ontology: CaptionOntology
+    # owlvit_model: model
 
     def __init__(self, ontology: CaptionOntology):
         self.ontology = ontology
-        self.owlvit_model = model
+        self.model = OwlViTForObjectDetection.from_pretrained(
+            "google/owlvit-large-patch14"
+        ).to(DEVICE)
+        self.processor = OwlViTProcessor.from_pretrained("google/owlvit-large-patch14")
 
     def predict(self, input: str) -> sv.Detections:
         labels = self.ontology.prompts()
@@ -33,20 +31,22 @@ class OWLViT(DetectionBaseModel):
 
         with torch.no_grad():
             if isinstance(self.ontology, CaptionOntology):
-                inputs = processor(text=labels, images=image, return_tensors="pt").to(
-                    DEVICE
-                )
-                outputs = model(**inputs)
+                inputs = self.processor(
+                    text=labels, images=image, return_tensors="pt"
+                ).to(DEVICE)
+                outputs = self.model(**inputs)
             elif isinstance(self.ontology, DetectionOntology):
-                inputs = processor(
+                inputs = self.processor(
                     query_images=labels, images=image, return_tensors="pt"
                 ).to(DEVICE)
-                outputs = model.image_guided_detection(**inputs)
+                outputs = self.model.image_guided_detection(**inputs)
                 outputs["pred_boxes"] = outputs["target_pred_boxes"]
 
             target_sizes = torch.Tensor([image.size[::-1]]).to(DEVICE)
 
-            results = processor.post_process(outputs=outputs, target_sizes=target_sizes)
+            results = self.processor.post_process(
+                outputs=outputs, target_sizes=target_sizes
+            )
 
             results = [
                 {k: v.to(torch.device("cpu")) for k, v in t.items()} for t in results
