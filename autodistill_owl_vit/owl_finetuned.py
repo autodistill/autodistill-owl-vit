@@ -4,7 +4,7 @@ import os
 import numpy as np
 import supervision as sv
 import torch
-from autodistill.detection import DetectionBaseModel
+from autodistill.detection.detection_base_model import DetectionBaseModel
 from PIL import Image
 from transformers import OwlViTForObjectDetection, OwlViTProcessor
 
@@ -74,9 +74,9 @@ class OWLViT_Finetuned(DetectionBaseModel):
             #     print("Not implemented")
             #     exit()
 
-            # target_sizes = torch.Tensor([image.size[::-1]]).to(DEVICE)
+            target_sizes = torch.Tensor([image.size[::-1]]).to(DEVICE)
 
-            # results = processor.post_process(outputs=outputs, target_sizes=target_sizes)
+            results = self.processor.post_process(outputs=outputs, target_sizes=target_sizes)
 
             # results = [
             #     {k: v.to(torch.device("cpu")) for k, v in t.items()} for t in results

@@ -4,7 +4,10 @@ from dataclasses import dataclass
 import numpy as np
 import supervision as sv
 import torch
-from autodistill.detection import CaptionOntology, DetectionBaseModel, DetectionOntology
+from autodistill.detection.caption_ontology import CaptionOntology
+from autodistill.detection.detection_base_model import DetectionBaseModel
+
+# , DetectionBaseModel, DetectionOntology
 from PIL import Image
 from transformers import OwlViTForObjectDetection, OwlViTProcessor
 
