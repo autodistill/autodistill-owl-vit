@@ -33,7 +33,7 @@ class OWLViT(DetectionBaseModel):
         image = load_image(input, return_format="PIL")
 
         with torch.no_grad():
-            inputs = processor(text=labels, images=image, return_tensors="pt")
+            inputs = processor(text=labels, images=image, return_tensors="pt").to(DEVICE)
             outputs = model(**inputs)
 
             target_sizes = torch.Tensor([image.size[::-1]])
